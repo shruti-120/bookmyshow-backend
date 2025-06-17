@@ -23,7 +23,7 @@ public class SeatServiceImpl implements SeatService{
     private final BookingSeatRepository bookingSeatRepository;
     private final SeatMapper seatMapper;
 
-    public List<SeatStatusDTO> getSeatsForShow(Long showId) {
+    public Map<String, List<SeatStatusDTO>> getSeatsForShow(Long showId) {
         Show show = showRepository.findById(showId)
             .orElseThrow(() -> new EntityNotFoundException("Show not found with ID: "+ showId));
             
@@ -36,7 +36,7 @@ public class SeatServiceImpl implements SeatService{
 
         return allSeats.stream()
                        .map(seat -> seatMapper.toDto(seat, bookedSeatIds))
-                       .collect(Collectors.toList());
+                       .collect(Collectors.groupingBy(dto -> dto.getSeatNumber().substring(0, 1)));
 
-            }
+    }
 }

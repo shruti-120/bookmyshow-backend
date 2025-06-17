@@ -1,6 +1,6 @@
 package com.bookmyshow.controllers.user;
 
-import java.util.List;
+import java.util.*;
 
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +16,7 @@ public class UserSeatController {
     private final SeatService seatService;
 
     @GetMapping("shows/{showId}/seats")
-    public List<SeatStatusDTO> getSeatsForShow(@PathVariable(name = "showId") Long showId) {
+    public Map<String, List<SeatStatusDTO>> getSeatsForShow(@PathVariable(name = "showId") Long showId) {
         return seatService.getSeatsForShow(showId);
     }
 }

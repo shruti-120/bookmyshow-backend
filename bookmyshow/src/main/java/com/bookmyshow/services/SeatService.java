@@ -1,10 +1,10 @@
 package com.bookmyshow.services;
 
-import java.util.List;
+import java.util.*;
 
 import com.bookmyshow.dtos.seat.*;
 
 public interface SeatService {
     
-    public List<SeatStatusDTO> getSeatsForShow(Long showId);
+    public Map<String, List<SeatStatusDTO>> getSeatsForShow(Long showId);
 }

@@ -21,7 +21,9 @@ public class Screen {
 
     private int screenNumber;
 
+    @Column(name = "total_columns")
     private int rows;
+    @Column(name = "total_rows")
     private int columns;
 
     @ManyToOne

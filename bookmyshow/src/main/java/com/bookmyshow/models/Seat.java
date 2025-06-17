@@ -22,7 +22,7 @@ public class Seat {
     private String seatNumber;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "seat_type")
     private SeatType seatType;
 
     @ManyToOne
