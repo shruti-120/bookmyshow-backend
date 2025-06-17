@@ -1,7 +1,6 @@
 package com.bookmyshow.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import lombok.*;
 
 
@@ -15,16 +14,15 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Screen {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include
     private Long id;
 
     private int screenNumber;
 
-    private int seatingCapacity;
+    private int rows;
+    private int columns;
 
     @ManyToOne
     @JoinColumn(name = "theatre_id", nullable = false)

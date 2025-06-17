@@ -4,6 +4,7 @@ import com.bookmyshow.dtos.theatre.TheatreResponseDTO;
 
 import lombok.*;
 
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor
@@ -11,6 +12,7 @@ import lombok.*;
 public class ScreenResponseDTO {
     private Long id;
     private int screenNumber;
-    private int seatingCapacity;
+    private int rows;
+    private int columns;
     private TheatreResponseDTO theatre;
 }

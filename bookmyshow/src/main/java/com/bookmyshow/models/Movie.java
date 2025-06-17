@@ -5,9 +5,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Builder
@@ -28,4 +30,7 @@ public class Movie {
 
     private String genre;
     private String language;
+
+    @OneToMany(mappedBy = "movie")
+    private List<Show> shows;
 }

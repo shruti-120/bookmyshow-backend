@@ -1,5 +1,8 @@
 package com.bookmyshow.services.impl;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
 import com.bookmyshow.dtos.show.*;
@@ -33,5 +36,24 @@ public class ShowServiceImpl implements ShowService{
 
         show = showRepository.save(show);
         return showMapper.toDTO(show);
+    }
+
+    @Override
+    public List<ShowResponseDTO> getShowsByTheatreAndMovieId(Long id, Long movieId) {
+        List<Show> shows = showRepository.findShowsByTheatreAndMovieId(id, movieId);
+
+        return shows.stream()
+                       .map(showMapper::toDTO)
+                       .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ShowResponseDTO> getShowsByMovieId(Long movieId) {
+        List<Show> shows = showRepository.findShowsByMovieId(movieId);
+
+        return shows.stream()
+                    .map(showMapper::toDTO)
+                    .collect(Collectors.toList());
+
     }
 }
