@@ -6,6 +6,7 @@ import java.util.Map;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import lombok.*;
@@ -39,6 +40,6 @@ public class Show implements java.io.Serializable {
     @MapKeyEnumerated(EnumType.STRING) 
     @MapKeyColumn(name = "seat_type")
     @Column(name = "price")
-    private Map<SeatType, Double> priceMap;
+    private Map<SeatType, BigDecimal> priceMap;
 
 }

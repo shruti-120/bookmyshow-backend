@@ -1,5 +1,6 @@
 package com.bookmyshow.dtos.show;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -20,5 +21,5 @@ public class ShowResponseDTO {
     private LocalDateTime endTime;
     private MovieResponseDTO movie;
     private ScreenResponseDTO screen;
-    private Map<SeatType, Double> priceMap;
+    private Map<SeatType, BigDecimal> priceMap;
 }

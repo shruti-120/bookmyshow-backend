@@ -10,12 +10,14 @@ import com.bookmyshow.mappers.ScreenMapper;
 import com.bookmyshow.models.*;
 import com.bookmyshow.repositories.*;
 import com.bookmyshow.services.ScreenService;
+import com.bookmyshow.utils.ResourceNotFoundException;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ScreenServiceImpl implements ScreenService {
     private final ScreenRepository screenRepository;
     private final TheatreRepository theatreRepository;
@@ -24,14 +26,20 @@ public class ScreenServiceImpl implements ScreenService {
 
     @Override
     public ScreenResponseDTO addScreenToTheatre(ScreenRequestDTO requestDTO, Long theatreId) {
+        log.info("Adding screen to theatre ID: {}", theatreId);
+
         // Step 1: Fetch Theatre
         Theatre theatre = theatreRepository.findById(theatreId)
-            .orElseThrow(() -> new EntityNotFoundException("Theatre not found with id: " + theatreId));
+            .orElseThrow(() -> {
+                log.warn("Theatre not found with ID: {}", theatreId);
+                return new ResourceNotFoundException("Theatre not found with id: " + theatreId);
+            });
 
         // Step 2: Create Screen entity and set theatre
         Screen screen = screenMapper.toEntity(requestDTO);
         screen.setTheatre(theatre);
         screen = screenRepository.save(screen); // save to get ID
+        log.info("Screen saved with ID: {}", screen.getId());
 
         // Step 3: Map each row (A, B, ...) to SeatType from the request
         Map<String, SeatType> rowToType = new HashMap<>();
@@ -63,6 +71,7 @@ public class ScreenServiceImpl implements ScreenService {
 
         // Step 5: Persist all seats
         seatRepository.saveAll(seats);
+        log.info("Generated and saved {} seats for screen ID: {}", seats.size(), screen.getId());
 
         // Step 6: Return DTO
         return screenMapper.toDTO(screen);

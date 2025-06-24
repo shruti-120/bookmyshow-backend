@@ -1,5 +1,6 @@
 package com.bookmyshow.dtos.show;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -34,5 +35,5 @@ public class ShowRequestDTO {
     @NotEmpty(message = "Price map cannot be empty")
     private Map<@NotNull(message = "Seat type cannot be null") SeatType,
                 @NotNull(message = "Price cannot be null")
-                @Positive(message = "Price must be a positive value") Double> priceMap;
+                @Positive(message = "Price must be a positive value") BigDecimal> priceMap;
 }

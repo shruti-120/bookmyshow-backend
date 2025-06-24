@@ -1,5 +1,7 @@
 package com.bookmyshow.models;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.*;
 
 import lombok.*;
@@ -14,7 +16,7 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
-public class BookingSeat {
+public class BookedSeat {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,8 +26,12 @@ public class BookingSeat {
     private Seat seat;
 
     @ManyToOne
+    @JoinColumn(name = "show_id", nullable = false)
+    private Show show;
+
+    @ManyToOne
     @JoinColumn(name = "booking_id", nullable = false)
     private Booking booking;
 
-    private double pricePaid;
+    private BigDecimal pricePaid;
 }
