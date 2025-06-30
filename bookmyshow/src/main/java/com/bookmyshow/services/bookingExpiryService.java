@@ -18,29 +18,35 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class bookingExpiryService {
+public class BookingExpiryService {
     
     private final BookingRepository bookingRepository;
     private final BookedSeatRepository bookedSeatRepository;
  
-    @Scheduled(fixedRate = 60000) //Runs every minute
+    @Scheduled(fixedRate = 60000)
     public void expireOldBookings() {
-        LocalDateTime expiryTime = LocalDateTime.now().minusMinutes(10);
+        try {
+            LocalDateTime expiryTime = LocalDateTime.now().minusMinutes(10);
+            List<Booking> expiredBookings = bookingRepository.findByStatusAndBookingTimeBefore(BookingStatus.PENDING, expiryTime);
 
-        List<Booking> expiredBookings = bookingRepository.findByStatusAndBookingTimeBefore(BookingStatus.PENDING, expiryTime);
+            if (expiredBookings.isEmpty()) {
+                log.info("No expired bookings found at {}", LocalDateTime.now());
+                return;
+            }
 
-        if (expiredBookings.isEmpty()) {
-            log.info("No expired bookings found at {}", LocalDateTime.now());
+            for (Booking booking : expiredBookings) {
+                List<BookedSeat> bookedSeats = bookedSeatRepository.findByBookingId(booking.getId());
+                bookedSeatRepository.deleteAll(bookedSeats);
+                booking.setStatus(BookingStatus.CANCELLED);
+
+                log.info("Booking expired: bookingId={}, cancelledSeats={}", booking.getId(), bookedSeats.size());
+            }
+
+            bookingRepository.saveAll(expiredBookings);
+
+        } catch (Exception ex) {
+            log.error("Error while expiring bookings", ex);
         }
-
-        for(Booking booking: expiredBookings) {
-            List<BookedSeat> bookedSeats = bookedSeatRepository.findByBookingId(booking.getId());
-            bookedSeatRepository.deleteAll(bookedSeats);
-            booking.setStatus(BookingStatus.CANCELLED);
-
-            log.debug("Booking ID {} expired and {} seats removed", booking.getId(), bookedSeats.size());
-        }
-
-        bookingRepository.saveAll(expiredBookings);
     }
+
 }

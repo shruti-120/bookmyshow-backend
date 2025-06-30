@@ -1,7 +1,9 @@
 package com.bookmyshow.models;
 
-import jakarta.persistence.*;
+import com.bookmyshow.enums.Role;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.*;
 
 @Entity
@@ -19,8 +21,15 @@ public class User {
     private String name;
 
     @Column(nullable = false, unique = true)
+    @Email
     private String email;
 
     @Column(length = 15, nullable = false, unique = true)
     private String phone;
+
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 }

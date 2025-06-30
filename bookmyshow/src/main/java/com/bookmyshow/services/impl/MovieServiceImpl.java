@@ -10,7 +10,7 @@ import com.bookmyshow.mappers.MovieMapper;
 import com.bookmyshow.models.Movie;
 import com.bookmyshow.repositories.MovieRepository;
 import com.bookmyshow.services.MovieService;
-import com.bookmyshow.utils.ResourceNotFoundException;
+import com.bookmyshow.utils.exceptionHandlers.ResourceNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +24,11 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public MovieResponseDTO createMovie(MovieRequestDTO requestDTO) {
+        if (movieRepository.existsByTitleAndReleaseDate(requestDTO.getTitle(), requestDTO.getReleaseDate())) {
+            log.warn("Duplicate movie detected: {} ({})", requestDTO.getTitle(), requestDTO.getReleaseDate());
+            throw new IllegalStateException("Movie already exists");
+        }
+
         log.info("Adding movie: {}", requestDTO.getTitle());
 
         Movie movie = movieMapper.toEntity(requestDTO);

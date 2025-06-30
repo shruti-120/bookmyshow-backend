@@ -1,5 +1,6 @@
 package com.bookmyshow.controllers.admin;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.bookmyshow.dtos.theatre.*;
@@ -15,6 +16,7 @@ public class AdminTheatreController {
     
     private final TheatreService theatreService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public TheatreResponseDTO createTheatre(@Valid @RequestBody TheatreRequestDTO RequestDTO) {
         return theatreService.createTheatre(RequestDTO);

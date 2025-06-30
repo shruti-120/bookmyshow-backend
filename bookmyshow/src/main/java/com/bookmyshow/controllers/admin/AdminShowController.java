@@ -1,5 +1,6 @@
 package com.bookmyshow.controllers.admin;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class AdminShowController {
     private final ShowService showService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ShowResponseDTO addShow(@Valid @RequestBody ShowRequestDTO requestDTO) {
         return showService.addShow(requestDTO);

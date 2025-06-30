@@ -10,7 +10,7 @@ import com.bookmyshow.mappers.ShowMapper;
 import com.bookmyshow.models.Show;
 import com.bookmyshow.repositories.*;
 import com.bookmyshow.services.ShowService;
-import com.bookmyshow.utils.ResourceNotFoundException;
+import com.bookmyshow.utils.exceptionHandlers.ResourceNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +26,11 @@ public class ShowServiceImpl implements ShowService{
 
     @Override
     public ShowResponseDTO addShow(ShowRequestDTO requestDTO) {
+        if (!requestDTO.getStartTime().isBefore(requestDTO.getEndTime())) {
+            log.warn("Invalid show time: startTime {} is not before endTime {}", requestDTO.getStartTime(), requestDTO.getEndTime());
+            throw new IllegalStateException("Show start time must be before end time");
+        }
+
         log.info("Adding new show: movieId={}, screenId={}, start={}, end={}",
             requestDTO.getMovieId(), requestDTO.getScreenId(),
             requestDTO.getStartTime(), requestDTO.getEndTime());
@@ -55,12 +60,12 @@ public class ShowServiceImpl implements ShowService{
     }
 
     @Override
-    public List<ShowResponseDTO> getShowsByTheatreAndMovieId(Long id, Long movieId) {
-        log.info("Fetching shows for theatreId={}, movieId={}", id, movieId);
+    public List<ShowResponseDTO> getShowsByTheatreAndMovieId(Long theatreId , Long movieId) {
+        log.info("Fetching shows for theatreId={}, movieId={}", theatreId , movieId);
 
-        List<Show> shows = showRepository.findShowsByTheatreAndMovieId(id, movieId);
-        if (shows == null || shows.isEmpty()) {
-            log.warn("No shows found for theatreId={} and movieId={}", id, movieId);
+        List<Show> shows = showRepository.findShowsByTheatreAndMovieId(theatreId , movieId);
+        if (shows.isEmpty()) {
+            log.warn("No shows found for theatreId={} and movieId={}", theatreId , movieId);
             throw new ResourceNotFoundException("No shows found for the given theatre and movie ID.");
         }
 
@@ -75,7 +80,7 @@ public class ShowServiceImpl implements ShowService{
         
         List<Show> shows = showRepository.findShowsByMovieId(movieId);
 
-        if (shows == null || shows.isEmpty()) {
+        if (shows.isEmpty()) {
             log.warn("No shows found for movie ID: {}", movieId);
             throw new ResourceNotFoundException("No shows found for movie ID: " + movieId);
         }

@@ -10,7 +10,7 @@ import com.bookmyshow.mappers.TheatreMapper;
 import com.bookmyshow.models.Theatre;
 import com.bookmyshow.repositories.TheatreRepository;
 import com.bookmyshow.services.TheatreService;
-import com.bookmyshow.utils.ResourceNotFoundException;
+import com.bookmyshow.utils.exceptionHandlers.ResourceNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

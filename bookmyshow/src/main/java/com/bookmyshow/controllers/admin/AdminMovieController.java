@@ -1,5 +1,6 @@
 package com.bookmyshow.controllers.admin;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.bookmyshow.dtos.movie.*;
@@ -15,6 +16,7 @@ public class AdminMovieController {
     
     private final MovieService movieService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping 
     public MovieResponseDTO createMovie(@Valid @RequestBody MovieRequestDTO movieRequestDTO) {
         return movieService.createMovie(movieRequestDTO);
