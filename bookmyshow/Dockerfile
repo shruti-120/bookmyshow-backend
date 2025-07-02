@@ -1,19 +1,22 @@
-# Multi-stage Dockerfile for Spring Boot and Gradle
-
-# Stage 1: Build the application using Gradle
+# Stage 1: Build using Gradle
 FROM gradle:7.6-jdk17 AS builder
-WORKDIR /home/gradle/project
-COPY --chown=gradle:gradle . .
-RUN gradle build --no-daemon -x test
 
-# Stage 2: Create a smaller image with only the JAR
+WORKDIR /home/gradle/project
+
+# Copy build files first (leverage Docker cache)
+COPY build.gradle settings.gradle ./
+COPY gradle gradle
+RUN gradle clean assemble --no-daemon || true
+
+# Copy rest of source
+COPY . .
+
+# 👇 This forces annotation processing
+RUN gradle build --no-daemon -x test --info
+
+# Stage 2: Runtime image
 FROM openjdk:17-jdk-slim
 WORKDIR /app
-# Copy the fat jar from the builder stage
 COPY --from=builder /home/gradle/project/build/libs/*.jar app.jar
-
-# Expose the application port
 EXPOSE 8080
-
-# Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
