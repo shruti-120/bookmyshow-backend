@@ -60,7 +60,7 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs += ['-parameters']
-    options.annotationProcessorPath = configurations.annotationProcessor
+tasks.withType(JavaCompile) {
+    options.annotationProcessorGeneratedSourcesDirectory = file("build/generated/sources/annotationProcessor/java/main")
 }
+
