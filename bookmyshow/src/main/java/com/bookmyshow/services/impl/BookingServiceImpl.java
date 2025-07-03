@@ -2,7 +2,6 @@ package com.bookmyshow.services.impl;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -15,7 +14,6 @@ import com.bookmyshow.models.*;
 import com.bookmyshow.repositories.*;
 import com.bookmyshow.services.BookingService;
 import com.bookmyshow.services.BookingTransactionService;
-import com.bookmyshow.services.EmailService;
 import com.bookmyshow.utils.exceptionHandlers.ResourceNotFoundException;
 
 import jakarta.transaction.Transactional;
@@ -33,7 +31,6 @@ public class BookingServiceImpl implements BookingService {
     private final SeatRepository seatRepository;
 
     private final BookingTransactionService bookingTransactionService;
-    private final EmailService emailService;
 
     private static final Long GUEST_USER_ID = 999L;
 
@@ -97,23 +94,6 @@ public class BookingServiceImpl implements BookingService {
 
         log.info("Booking created successfully: ID={}, User={}, Seats={}, Total={}",
                 booking.getId(), userId, seats.size(), totalAmount);
-
-        try {
-            String bookingId = booking.getId().toString();
-            String seatDetails = seats.stream().map(Seat::getSeatNumber).collect(Collectors.joining(", "));
-
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
-            String showTime = show.getStartTime().format(formatter);
-
-            String movieTitle = show.getMovie().getTitle();
-            String theatreName = show.getScreen().getTheatre().getName();
-
-            String toEmail = "shrutisuman120@gmail.com";
-
-            emailService.sendBookingConfirmation(toEmail, bookingId, seatDetails, showTime, movieTitle, theatreName);
-        } catch (Exception e) { 
-            log.error("Failed to send confirmation email for booking ID {}: {}", booking.getId(), e.getMessage());
-        }
 
         return BookingResponseDTO.builder()
                     .bookingId(booking.getId())
