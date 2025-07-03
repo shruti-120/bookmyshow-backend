@@ -15,11 +15,11 @@ import com.bookmyshow.repositories.BookingRepository;
 import com.bookmyshow.repositories.UserRepository;
 import com.bookmyshow.services.EmailService;
 import com.bookmyshow.services.PaymentService;
-import com.bookmyshow.utils.Helper;
 import com.bookmyshow.utils.exceptionHandlers.ResourceNotFoundException;
 import com.razorpay.Order;
 import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
+import com.razorpay.Utils;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -59,10 +59,10 @@ public class PaymentServiceImpl implements PaymentService{
     }
 
     @Override
-    public boolean verifySignature(String payload, String actualSignature) {
+    public boolean verifySignature(String payload, String razorpaySignature) {
         try {
-            String expected = Helper.calculateHMACSHA256(payload, webhookSecret);
-            return expected.equals(actualSignature);
+            boolean isValid = Utils.verifyWebhookSignature(payload, razorpaySignature, webhookSecret);
+            return isValid;  
         } catch (Exception e) {
             return false;
         }
