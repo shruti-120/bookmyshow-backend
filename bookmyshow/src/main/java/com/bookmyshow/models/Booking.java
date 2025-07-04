@@ -24,6 +24,10 @@ public class Booking {
 
     private Long userId;
 
+    @Column(name = "razorpay_order_id")
+    private String orderId;
+
+
     @ManyToOne
     @JoinColumn(name = "show_id", nullable = false)
     private Show show;

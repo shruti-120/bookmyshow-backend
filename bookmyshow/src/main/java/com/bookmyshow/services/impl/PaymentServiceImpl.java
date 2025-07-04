@@ -55,6 +55,12 @@ public class PaymentServiceImpl implements PaymentService{
         orderRequest.put("payment_capture", true);
 
         Order order = razorpay.orders.create(orderRequest);
+
+        Booking booking = bookingRepository.findById(bookingId)
+                            .orElseThrow(() -> new ResourceNotFoundException("Booking not found for ID: {}"+ bookingId));
+        
+        booking.setOrderId(order.get("id"));
+        bookingRepository.save(booking);
         return order.toString();
     }
 
@@ -86,32 +92,21 @@ public class PaymentServiceImpl implements PaymentService{
 
             String razorpayOrderId = payment.getString("order_id");
             String paymentId = payment.getString("id");
-            BigDecimal amountPaid = BigDecimal.valueOf(payment.getInt("amount")).divide(BigDecimal.valueOf(100));
 
             log.info("Captured payment for Razorpay Order ID: {}", razorpayOrderId);
 
-            // Lookup booking by receipt/order ID
-            String receiptId = razorpayOrderId.replace("order_", "booking_"); // if you used this pattern
-            Long bookingId;
-            try {
-                bookingId = Long.parseLong(receiptId.replace("booking_", ""));
-            } catch (NumberFormatException e) {
-                log.error("Invalid receipt ID: {}", receiptId);
-                return;
-            }
-
-            Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new ResourceNotFoundException("Booking not found for ID: " + bookingId));
+            Booking booking = bookingRepository.findByOrderId(razorpayOrderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found for Order ID: " + razorpayOrderId));
 
             if (booking.getStatus() == BookingStatus.CONFIRMED) {
-                log.info("Booking already confirmed: {}", bookingId);
+                log.info("Booking already confirmed: {}", booking.getId());
                 return;
             }
 
             booking.setStatus(BookingStatus.CONFIRMED);
             bookingRepository.save(booking);
 
-            log.info("Booking {} confirmed after successful payment. Razorpay payment ID: {}", bookingId, paymentId);
+            log.info("Booking {} confirmed after successful payment. Razorpay payment ID: {}", booking.getId(), paymentId);
 
             Long userId = booking.getUserId();
             User user = userRepository.findById(userId)
@@ -127,7 +122,7 @@ public class PaymentServiceImpl implements PaymentService{
             String theatreName = booking.getShow().getScreen().getTheatre().getName();
             String showTime = booking.getShow().getStartTime().format(DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a"));
 
-            emailService.sendBookingConfirmation(toEmail, bookingId.toString(), seatDetails, showTime, movieTitle, theatreName);
+            emailService.sendBookingConfirmation(toEmail, booking.getId().toString(), seatDetails, showTime, movieTitle, theatreName);
 
 
         } catch (Exception e) {
