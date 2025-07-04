@@ -24,7 +24,7 @@ public class Booking {
 
     private Long userId;
 
-    @Column(name = "razorpay_order_id")
+    @Column(name = "order_id")
     private String orderId;
 
 
