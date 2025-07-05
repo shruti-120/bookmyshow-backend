@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.bookmyshow.dtos.booking.*;
@@ -88,7 +89,13 @@ public class BookingServiceImpl implements BookingService {
             totalAmount = totalAmount.add(price);
         }
 
-        bookedSeatRepository.saveAll(bookedSeats);
+        try {
+            bookedSeatRepository.saveAll(bookedSeats);
+        } catch (DataIntegrityViolationException ex) {
+            log.error("Concurrent booking attempt detected. Likely duplicate seat booking.", ex);
+            throw new IllegalStateException("One or more seats have already been booked by another user.");
+        }
+
         booking.setBookedSeats(bookedSeats);
         booking.setTotalAmount(totalAmount);
 
